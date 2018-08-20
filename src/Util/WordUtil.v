@@ -1357,3 +1357,20 @@ Proof.
   apply Z.pow_le_mono; [|assumption].
   split; simpl; omega.
 Qed.
+
+Definition uwordToZ {sz} (w : word sz) : Z := Z.of_N (wordToN w).
+
+Lemma uwordToZ_ZToWord: forall {sz: nat} (n: Z),
+    (uwordToZ (ZToWord sz n) = n mod 2 ^ (Z.of_nat sz))%Z.
+Proof.
+  intros.
+  unfold uwordToZ.
+  pose proof (@WordNZ_split1 sz 0) as P.
+  specialize (P (eq_rect sz word (ZToWord sz n) (sz + 0) (eq_sym (Nat.add_0_r sz)))).
+  rewrite split1_0 in P.
+  rewrite P. clear P.
+  remember (eq_sym (add_0_r sz)) as p. clear Heqp. destruct p. simpl.
+  unfold Z.pow2_mod.
+  rewrite Z.land_ones by lia.
+
+Abort.
